@@ -1,0 +1,34 @@
+from bs4 import BeautifulSoup as bs
+import requests #to access website
+import pandas as pd
+
+r = requests.get("https://www.imdb.com/chart/top/")
+
+# Convert to a beautiful soup object
+soup = bs(r.content)
+
+# Print out HTML
+contents = soup.prettify()
+print(contents[:100])
+
+movie_title = []
+movie_year = []
+movie_rating = []
+
+imdb_table = soup.find(class_="chart full-width")
+movie_titlecolumn = imdb_table.find_all(class_="titleColumn")
+movie_ratingscolumn = imdb_table.find_all(class_="ratingColumn imdbRating")
+
+for row in movie_titlecolumn:
+    title = row.a.text # tag content extraction
+    movie_title.append(title)
+movie_title
+
+for row in movie_ratingscolumn:
+    rating = row.strong.text # tag content extraction
+    movie_rating.append(rating)
+movie_rating
+
+movie_df = pd.DataFrame({'Movie Title': movie_title, 'Year of Release': movie_year, 'IMDb Rating': movie_rating})
+movie_df.head(30) #View first 30 rows of dataframe
+
